@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>BookTrack — Sign in</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}" />
+</head>
+<body class="bg-gradient">
+  <div class="app-brand"><span class="accent">BookTrack</span></div>
+
+  <main class="center-wrap">
+    <section class="card">
+      <h2>Sign in</h2>
+
+      <div th:if="${param.error}" class="alert err">Invalid credentials</div>
+      <div th:if="${param.logout}" class="alert ok">You have been signed out</div>
+
+      <form th:action="@{/login}" method="post">
+        <label for="username">Username</label>
+        <input id="username" name="username" autocomplete="username" />
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" />
+
+        <div style="margin-top:14px" class="row">
+          <button type="submit" class="right">Sign in</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

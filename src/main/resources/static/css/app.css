@@ -1,0 +1,129 @@
+/* ========== BookTrack theme ========== */
+:root{
+  --bg1:#0f172a;        /* dark navy */
+  --bg2:#1e40af;        /* indigo */
+  --brand:#22d3ee;      /* cyan */
+  --brand-2:#a78bfa;    /* violet */
+  --ink:#e5e7eb;        /* light text */
+  --muted:#94a3b8;      /* slate */
+  --card:#0b1220a6;     /* glass */
+  --ok:#16a34a;
+  --err:#ef4444;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body.bg-gradient{
+  margin:0; color:var(--ink);
+  background: radial-gradient(1200px 800px at 10% -10%, var(--bg2), transparent 60%),
+              radial-gradient(1200px 800px at 110% 10%, var(--brand-2), transparent 60%),
+              linear-gradient(135deg, var(--bg1), #111827 60%);
+  font: 16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+}
+
+/* ---- app brand strip ---- */
+.app-brand{
+  text-align:center;
+  font-weight:800;
+  font-size: clamp(28px, 4vw, 40px);
+  letter-spacing:.5px;
+  padding:28px 16px 6px;
+  color:white;
+}
+.app-brand .accent{
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+
+/* ---- centered card (login, forms) ---- */
+.center-wrap{
+  min-height: calc(100% - 82px);
+  display:grid; place-items:center; padding:24px;
+}
+.card{
+  width:min(520px, 92vw);
+  background:var(--card); backdrop-filter: blur(8px);
+  border:1px solid #33415570; border-radius:16px;
+  box-shadow: 0 10px 30px #0008;
+  padding:28px;
+}
+.card h2{margin:0 0 14px}
+
+/* alerts */
+.alert{padding:10px 12px;border-radius:10px;margin:8px 0 14px}
+.alert.err{background:#ef44441a;border:1px solid #ef444480;color:#fecaca}
+.alert.ok{background:#16a34a1a;border:1px solid #16a34a80;color:#bbf7d0}
+
+/* forms */
+label{display:block;margin:.6rem 0 .25rem;color:var(--muted)}
+input, select{
+  width:100%; border:1px solid #334155; background:#0b1220;
+  color:var(--ink); padding:10px 12px; border-radius:10px;
+}
+button, .btn{
+  display:inline-block; border:0; cursor:pointer; text-decoration:none;
+  padding:10px 16px; border-radius:10px; font-weight:700;
+  background:linear-gradient(90deg, var(--brand), var(--brand-2));
+  color:#001018; transition: transform .05s ease, filter .1s;
+}
+button:hover,.btn:hover{filter:brightness(1.1)}
+button:active,.btn:active{transform:translateY(1px)}
+
+/* ---- header / navbar ---- */
+.nav{
+  display:flex; align-items:center; gap:12px; padding:14px 20px;
+  border-bottom:1px solid #33415570; background:#0b1220aa; backdrop-filter:blur(6px);
+}
+.nav .grow{flex:1}
+.nav a{color:var(--ink); text-decoration:none; opacity:.9}
+.nav a:hover{opacity:1}
+
+/* ---- table ---- */
+.table{
+  width:100%; border-collapse:separate; border-spacing:0;
+  margin-top:16px; overflow:hidden; border-radius:14px; border:1px solid #33415570;
+}
+.table th, .table td{padding:12px 14px}
+.table thead th{
+  text-align:left; font-weight:800; color:#dbeafe;
+  background: linear-gradient(90deg,#1e293b,#0f172a);
+}
+.table tbody tr{background:#0b1220e0}
+.table tbody tr:nth-child(odd){background:#0b1220b8}
+.table tbody tr:hover{outline:1px solid #334155; background:#0b1220}
+
+/* small helpers */
+.row{display:flex; gap:10px; align-items:center}
+.right{margin-left:auto}
+.badge{padding:4px 10px; border-radius:999px; background:#1f2937; color:#cbd5e1}
+
+/* ===== Page backdrop (no more plain white) ===== */
+html, body {
+  /* subtle dark, formal gradient */
+  background:
+    radial-gradient(1100px 700px at 15% -10%, #111827 0%, #0e1629 40%),
+    linear-gradient(180deg, #0b1220 0%, #0a0f1c 100%);
+  color: #cbd5e1;
+}
+
+/* Make table text readable on brighter rows */
+.table th, .table td {
+  color: #e5e7eb;
+}
+
+/* ===== Book rows: a little brighter, hover = brighter (not white) ===== */
+.table tbody tr {
+  background: #182238;              /* base row */
+  transition: background .2s ease, transform .06s ease;
+}
+.table tbody tr:nth-child(odd) {
+  background: #1e2b44;              /* slightly brighter stripe */
+}
+.table tbody tr:hover {
+  background: #2b3e62;              /* brighter on hover, not white */
+  outline: 1px solid #334155;       /* subtle focus edge */
+}
+.table tbody tr:active {
+  background: #35507b;              /* tiny bump when clicked */
+}
+
