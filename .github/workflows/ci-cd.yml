@@ -1,0 +1,55 @@
+name: build-and-deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn -B -ntp clean package -DskipTests
+
+      - name: Prepare package (JAR + web.config)
+        shell: pwsh
+        run: |
+          $jar = (Get-ChildItem -Path target -Filter *.jar | Select-Object -First 1).FullName
+          Copy-Item $jar application.jar
+          if (-not (Test-Path web.config)) { throw "web.config not found at repo root" }
+          Compress-Archive -Path application.jar, web.config -DestinationPath package.zip -Force
+          Get-ChildItem package.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-package
+          path: package.zip
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-package
+          path: .
+
+      - name: Deploy to Azure Web App (Windows)
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: booktrack-app
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: package.zip
