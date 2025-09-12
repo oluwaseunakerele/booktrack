@@ -21,6 +21,7 @@ public class BookController {
     this.service = service;
   }
 
+  // LIST
   @GetMapping
   public String list(@RequestParam(required = false) String q, Model model) {
     model.addAttribute("books", service.findAll(q));
@@ -28,22 +29,27 @@ public class BookController {
     return "books/list";
   }
 
+  // CREATE FORM
   @GetMapping("/new")
   public String newForm(Model model) {
     model.addAttribute("book", new Book());
     return "books/form";
   }
 
+  // CREATE (Save)
   @PostMapping
-  public String create(@Valid @ModelAttribute Book book,
+  public String create(@Valid @ModelAttribute("book") Book book,
                        BindingResult br,
                        RedirectAttributes ra) {
-    if (br.hasErrors()) return "books/form";
+    if (br.hasErrors()) {
+      return "books/form";
+    }
     service.create(book);
     ra.addFlashAttribute("msg", "Book created");
     return "redirect:/books";
   }
 
+  // DETAILS
   @GetMapping("/{id}")
   public String details(@PathVariable Long id, Model model) {
     Book book = service.findById(id)
@@ -52,6 +58,7 @@ public class BookController {
     return "books/details";
   }
 
+  // EDIT FORM
   @GetMapping("/{id}/edit")
   public String edit(@PathVariable Long id, Model model) {
     Book book = service.findById(id)
@@ -60,17 +67,25 @@ public class BookController {
     return "books/form";
   }
 
+  // UPDATE (Save)
   @PostMapping("/{id}")
   public String update(@PathVariable Long id,
-                       @Valid @ModelAttribute Book book,  // BindingResult must follow this
+                       @Valid @ModelAttribute("book") Book book,
                        BindingResult br,
                        RedirectAttributes ra) {
-    if (br.hasErrors()) return "books/form";
+    // make sure the entity carries the path id
+    book.setId(id);
+
+    if (br.hasErrors()) {
+      // when we return to the form on error, book.id stays populated thanks to setId + hidden field
+      return "books/form";
+    }
     service.update(id, book);
     ra.addFlashAttribute("msg", "Book updated");
     return "redirect:/books";
   }
 
+  // DELETE
   @PostMapping("/{id}/delete")
   public String delete(@PathVariable Long id, RedirectAttributes ra) {
     service.delete(id);

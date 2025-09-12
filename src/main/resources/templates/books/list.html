@@ -1,55 +1,68 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Books • BookTrack</title>
-  <link rel="stylesheet" th:href="@{/css/app.css}" />
+  <meta charset="UTF-8"/>
+  <title>BookTrack — Books</title>
+  <!-- use the CSS you already created -->
+  <link rel="stylesheet" th:href="@{/css/app.css}"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
 </head>
-<body class="page">
-<header class="app-header">
-  <h1 class="title">Book<span class="accent">Track</span></h1>
-</header>
+<body class="bg-gradient">
+  <!-- Brand -->
+  <div class="app-brand"><span class="accent">BookTrack</span></div>
 
-<main class="container">
-  <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1rem;">
-    <form th:action="@{/books}" method="get" style="display:flex;gap:.5rem;align-items:center;">
-      <input type="text" name="q" th:value="${q}" placeholder="Search title" />
-      <button type="submit" class="btn">Search</button>
-    </form>
-    <a th:href="@{/books/new}" class="btn btn--primary">Add Book</a>
-    <div th:if="${msg}" class="pill pill--ok" th:text="${msg}">Message</div>
-  </div>
+  <main style="max-width:1100px;margin:0 auto;padding:0 16px 28px;">
+    <!-- Top bar: search + add -->
+    <div class="nav" style="border-radius:14px;margin-top:6px;">
+      <form class="row grow" th:action="@{/books}" method="get" autocomplete="off">
+        <input type="text" name="q" placeholder="Search title" th:value="${q}"/>
+        <button type="submit" class="btn">Search</button>
+      </form>
+      <a class="btn" th:href="@{/books/new}">Add Book</a>
+    </div>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Author</th>
-        <th style="width:120px;">Price</th>
-        <th style="width:260px;">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr th:each="b : ${books}">
-        <td th:text="${b.title}">Title</td>
-        <td th:text="${b.author}">Author</td>
-        <td th:text="${#numbers.formatDecimal(b.price,1,'POINT',2,'NONE')}">$0.00</td>
-        <td>
-          <a class="btn btn--ghost" th:href="@{|/books/${b.id}|}">View</a>
-          <a class="btn btn--light" th:href="@{|/books/${b.id}/edit|}">Edit</a>
-          <form th:action="@{|/books/${b.id}/delete|}" method="post" style="display:inline">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <button class="btn btn--danger" type="submit"
-                    onclick="return confirm('Delete this book?')">Delete</button>
-          </form>
-        </td>
-      </tr>
-      <tr th:if="${#lists.isEmpty(books)}">
-        <td colspan="4" style="text-align:center;color:#667085;">No books yet.</td>
-      </tr>
-    </tbody>
-  </table>
-</main>
+    <!-- Flash messages (optional) -->
+    <div th:if="${param.saved}" class="alert ok">Saved successfully</div>
+    <div th:if="${param.deleted}" class="alert ok">Deleted</div>
+
+    <!-- Books table -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th style="width:40%">Title</th>
+          <th style="width:30%">Author</th>
+          <th style="width:12%">Price</th>
+          <th style="width:18%">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="b : ${books}">
+          <td th:text="${b.title}">Effective Java</td>
+          <td th:text="${b.author}">Joshua Bloch</td>
+          <td th:text="${b.price}">39.50</td>
+          <td>
+            <div class="row">
+              <a class="btn" th:href="@{'/books/' + ${b.id}}">View</a>
+              <a class="btn" th:href="@{'/books/' + ${b.id} + '/edit'}">Edit</a>
+              <form th:action="@{'/books/' + ${b.id} + '/delete'}" method="post"
+                    onsubmit="return confirm('Delete this book?')">
+                <!-- CSRF -->
+                <input type="hidden"
+                       th:if="${_csrf}"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}"/>
+                <button type="submit" class="btn">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty state -->
+        <tr th:if="${#lists.isEmpty(books)}">
+          <td colspan="4" class="badge">No books found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
 </body>
 </html>
