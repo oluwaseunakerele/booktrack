@@ -3,25 +3,32 @@
 <head>
   <meta charset="UTF-8"/>
   <title>BookTrack — Books</title>
-  <!-- use the CSS you already created -->
+  <!-- Static CSS served by Spring (src/main/resources/static/css/app.css) -->
   <link rel="stylesheet" th:href="@{/css/app.css}"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 </head>
 <body class="bg-gradient">
-  <!-- Brand -->
+  <!-- App brand (simple header) -->
   <div class="app-brand"><span class="accent">BookTrack</span></div>
 
   <main style="max-width:1100px;margin:0 auto;padding:0 16px 28px;">
-    <!-- Top bar: search + add -->
+    <!-- Top bar: search form and "Add Book" CTA -->
     <div class="nav" style="border-radius:14px;margin-top:6px;">
+      <!-- GET /books?q=... — server uses the 'q' param to filter -->
       <form class="row grow" th:action="@{/books}" method="get" autocomplete="off">
         <input type="text" name="q" placeholder="Search title" th:value="${q}"/>
         <button type="submit" class="btn">Search</button>
       </form>
+
+      <!-- Create flow starts at /books/new -->
       <a class="btn" th:href="@{/books/new}">Add Book</a>
     </div>
 
-    <!-- Flash messages (optional) -->
+    <!-- SUCCESS / INFO MESSAGES -->
+    <!-- Option A: show "msg" when controller uses FlashAttributes -->
+    <div th:if="${msg}" class="alert ok" th:text="${msg}">Saved successfully</div>
+
+    <!-- Option B: show when controller appends query flags like ?saved=1 or ?deleted=1 -->
     <div th:if="${param.saved}" class="alert ok">Saved successfully</div>
     <div th:if="${param.deleted}" class="alert ok">Deleted</div>
 
@@ -36,14 +43,22 @@
         </tr>
       </thead>
       <tbody>
+        <!-- Render each book -->
         <tr th:each="b : ${books}">
           <td th:text="${b.title}">Effective Java</td>
           <td th:text="${b.author}">Joshua Bloch</td>
-          <td th:text="${b.price}">39.50</td>
+          <!-- You can format decimals if price is BigDecimal -->
+          <td th:text="${#numbers.formatDecimal(b.price,1,'POINT',2,'NONE')}">39.50</td>
+
           <td>
             <div class="row">
+              <!-- View details -->
               <a class="btn" th:href="@{'/books/' + ${b.id}}">View</a>
+
+              <!-- Edit (goes to form page with fields bound, Save happens there) -->
               <a class="btn" th:href="@{'/books/' + ${b.id} + '/edit'}">Edit</a>
+
+              <!-- Delete (POST for safety + CSRF) -->
               <form th:action="@{'/books/' + ${b.id} + '/delete'}" method="post"
                     onsubmit="return confirm('Delete this book?')">
                 <!-- CSRF -->
@@ -66,3 +81,4 @@
   </main>
 </body>
 </html>
+

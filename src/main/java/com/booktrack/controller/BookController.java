@@ -12,7 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/books")
+@RequestMapping("/books") // All routes below live under /books
 public class BookController {
 
   private final BookService service;
@@ -21,44 +21,55 @@ public class BookController {
     this.service = service;
   }
 
-  // LIST
+  // ========= LIST =========
+  // GET /books?q=search
+  // Loads all books; if q is present, returns a filtered list.
   @GetMapping
   public String list(@RequestParam(required = false) String q, Model model) {
     model.addAttribute("books", service.findAll(q));
     model.addAttribute("q", q);
-    return "books/list";
+    return "books/list"; // templates/books/list.html
   }
 
-  // CREATE FORM
+  // ========= CREATE (FORM) =========
+  // GET /books/new
+  // Shows an empty form bound to a new Book.
   @GetMapping("/new")
   public String newForm(Model model) {
-    model.addAttribute("book", new Book());
-    return "books/form";
+    model.addAttribute("book", new Book()); // empty object for th:object
+    return "books/form";                    // reuse one form for new + edit
   }
 
-  // CREATE (Save)
+  // ========= CREATE (SUBMIT) =========
+  // POST /books
+  // Handles Save for NEW book (INSERT). Expect form action="/books".
   @PostMapping
   public String create(@Valid @ModelAttribute("book") Book book,
                        BindingResult br,
                        RedirectAttributes ra) {
     if (br.hasErrors()) {
+      // Redisplay with validation messages
       return "books/form";
     }
-    service.create(book);
+    service.create(book);                 // INSERT (id is null)
     ra.addFlashAttribute("msg", "Book created");
-    return "redirect:/books";
+    return "redirect:/books";             // or redirect:/books/{id}
   }
 
-  // DETAILS
+  // ========= DETAILS =========
+  // GET /books/{id}
+  // Read-only details view for one book.
   @GetMapping("/{id}")
   public String details(@PathVariable Long id, Model model) {
     Book book = service.findById(id)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
     model.addAttribute("book", book);
-    return "books/details";
+    return "books/details"; // templates/books/details.html
   }
 
-  // EDIT FORM
+  // ========= EDIT (FORM) =========
+  // GET /books/{id}/edit
+  // Loads existing book into the same form for editing.
   @GetMapping("/{id}/edit")
   public String edit(@PathVariable Long id, Model model) {
     Book book = service.findById(id)
@@ -67,25 +78,31 @@ public class BookController {
     return "books/form";
   }
 
-  // UPDATE (Save)
+  // ========= UPDATE (SUBMIT) =========
+  // POST /books/{id}
+  // Handles Save for EDIT (UPDATE). Expect form action="/books/{id}".
   @PostMapping("/{id}")
   public String update(@PathVariable Long id,
                        @Valid @ModelAttribute("book") Book book,
                        BindingResult br,
                        RedirectAttributes ra) {
-    // make sure the entity carries the path id
+
+    // Ensure the object carries the path id so JPA performs UPDATE, not INSERT
     book.setId(id);
 
     if (br.hasErrors()) {
-      // when we return to the form on error, book.id stays populated thanks to setId + hidden field
+      // On error, we return the form; hidden id in the form keeps the id intact
       return "books/form";
     }
-    service.update(id, book);
+
+    // Service should typically load existing, copy fields, then save
+    service.update(id, book);            // UPDATE
     ra.addFlashAttribute("msg", "Book updated");
-    return "redirect:/books";
+    return "redirect:/books";            // or "redirect:/books/{id}" to return to details
   }
 
-  // DELETE
+  // ========= DELETE =========
+  // POST /books/{id}/delete
   @PostMapping("/{id}/delete")
   public String delete(@PathVariable Long id, RedirectAttributes ra) {
     service.delete(id);

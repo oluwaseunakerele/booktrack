@@ -3,30 +3,36 @@
 <head>
   <meta charset="UTF-8"/>
   <title>Book details</title>
+  <!-- Load your app stylesheet through Spring MVC static mapping -->
   <link rel="stylesheet" th:href="@{/css/app.css}"/>
 </head>
 <body class="page">
 <header class="app-header">
   <h1>BookTrack</h1>
+  <!-- Back link takes user to the list page -->
   <nav><a th:href="@{/books}">← Back to list</a></nav>
 </header>
 
 <main class="card" style="max-width:800px;margin:auto">
   <h2>Book details</h2>
+
+  <!-- Display each field from the 'book' model attribute -->
   <p><strong>Title:</strong> <span th:text="${book.title}">Title</span></p>
   <p><strong>Author:</strong> <span th:text="${book.author}">Author</span></p>
   <p><strong>ISBN:</strong> <span th:text="${book.isbn}">ISBN</span></p>
-  <p><strong>Price:</strong> <span th:text="${book.price}">0.00</span></p>
-  <p><strong>Published On:</strong> <span th:text="${book.publishedOn}">2024-01-01</span></p>
+  <p><strong>Price:</strong> <span th:text="${#numbers.formatDecimal(book.price, 1, 'POINT', 2, 'NONE')}">0.00</span></p>
+  <p><strong>Published On:</strong> <span th:text="${#temporals.format(book.publishedOn, 'yyyy-MM-dd')}">2024-01-01</span></p>
   <p><strong>Description:</strong> <span th:text="${book.description}">Description</span></p>
 
   <div class="actions">
+    <!-- Edit navigates to an edit form (see section 2) -->
     <a class="btn" th:href="@{/books/{id}/edit(id=${book.id})}">Edit</a>
 
+    <!-- Delete posts to a controller that deletes the book by id (see section 3) -->
     <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post" style="display:inline">
+      <!-- CSRF token needed when Spring Security is enabled -->
       <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-      <button type="submit" class="btn danger"
-              onclick="return confirm('Delete this book?')">Delete</button>
+      <button type="submit" class="btn danger" onclick="return confirm('Delete this book?')">Delete</button>
     </form>
   </div>
 </main>
